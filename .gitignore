@@ -1,0 +1,19 @@
+ # Backend
+/backend/target/
+/backend/.mvn/
+/backend/*.log
+/backend/*.iml
+
+# Android
+/android/.idea/
+/android/.gradle/
+/android/local.properties
+/android/build/
+
+# Geral
+*.class
+*.jar
+*.war
+*.zip
+.DS_Store
+
