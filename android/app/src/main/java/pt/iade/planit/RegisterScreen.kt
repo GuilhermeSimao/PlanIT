@@ -95,7 +95,6 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botão para voltar à tela de login
             TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
                 Text("Já tem uma conta? Faça login aqui.")
             }

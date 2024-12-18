@@ -23,7 +23,6 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
-    // Fetch events
     LaunchedEffect(id) {
         id?.let { userId ->
             loginViewModel.getUserEvents(userId) { result ->
@@ -33,7 +32,6 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
         }
     }
 
-    // Scaffold with TopBar and FloatingActionButton
     Scaffold(
         topBar = {
             TopAppBar(

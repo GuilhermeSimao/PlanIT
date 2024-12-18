@@ -86,7 +86,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Localização: ${eventDetails.location.address}")
-                        // Aqui podes integrar um mapa, ex: Google Maps Compose
+                        // ADICIONAR MAPA
                     }
                 }
             }

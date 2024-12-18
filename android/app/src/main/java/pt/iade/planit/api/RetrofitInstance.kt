@@ -8,10 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
 
-    // Defina a URL base da sua API
     private const val BASE_URL = "http://10.0.2.2:8081"
 
-    // Instância do Retrofit configurada
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -22,7 +20,6 @@ object RetrofitInstance {
             .build()
     }
 
-    // Instância da ApiService para uso no aplicativo
     val api: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }

@@ -14,7 +14,6 @@ import pt.iade.planit.api.UserCredentials
 
 class LoginViewModel : ViewModel() {
 
-    // Função para login
     fun loginUser(email: String, password: String, onSuccess: (Int) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -29,7 +28,6 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Função para registrar o usuário
     fun registerUser(name: String, email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -51,7 +49,7 @@ class LoginViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("Events", "Error fetching user events", e)
                 withContext(Dispatchers.Main) {
-                    onResult(emptyList()) // Return an empty list on error
+                    onResult(emptyList())
                 }
             }
         }
