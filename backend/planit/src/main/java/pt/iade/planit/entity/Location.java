@@ -1,20 +1,24 @@
 package pt.iade.planit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
-@Data
 @Entity
+@Table(name = "Location")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Location {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String address;
-    private String latitude;
-    private String longitude;
 
+    @Column
+    private String address;
+
+    @Column(precision = 9)
+    private Double latitude;
+
+    @Column(precision = 9)
+    private Double longitude;
 }
