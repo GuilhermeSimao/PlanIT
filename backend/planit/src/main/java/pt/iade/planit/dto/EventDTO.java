@@ -3,6 +3,7 @@ package pt.iade.planit.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +26,8 @@ public class EventDTO {
 
     @JsonProperty("locationId")
     private Integer locationId; // Optional Location ID
+
+    // List of participants
+    @JsonProperty("participants")
+    private List<ParticipantDTO> participants;
 }

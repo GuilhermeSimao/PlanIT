@@ -21,4 +21,8 @@ interface ApiService {
 
     @POST("/event/add")
     suspend fun createEvent(@Body event: Event): Event
+
+    @GET("/event/{id}")
+    suspend fun getEventDetails(@Path("id") eventId: Int): EventDetailsResponse
+
 }

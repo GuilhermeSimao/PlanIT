@@ -1,5 +1,6 @@
 package pt.iade.planit
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -65,7 +66,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(events) { event ->
-                        EventCard(event)
+                        EventCard(event, navController)
                     }
                 }
             }
@@ -74,11 +75,14 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
 }
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(event: Event, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                navController.navigate(Screen.DetailScreen.withArgs(event.id.toString()))
+            },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

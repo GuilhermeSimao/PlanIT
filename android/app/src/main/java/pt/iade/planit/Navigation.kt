@@ -12,10 +12,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun Navigation() {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = viewModel()
-    NavHost(navController = navController, startDestination = Screen.Login.route){
+
+    NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(route = Screen.Login.route) {
             LoginScreen(loginViewModel = loginViewModel, navController = navController)
         }
+
         composable(
             route = Screen.MainScreen.route + "/{id}",
             arguments = listOf(
@@ -32,6 +34,7 @@ fun Navigation() {
                 navController = navController
             )
         }
+
         composable(route = Screen.Register.route) {
             RegisterScreen(
                 navController = navController,
@@ -48,6 +51,19 @@ fun Navigation() {
             )
         }
 
+        composable(
+            route = Screen.DetailScreen.route + "/{eventId}",
+            arguments = listOf(
+                navArgument("eventId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getInt("eventId") ?: 0
+            val eventDetailsViewModel: EventDetailsViewModel = viewModel()
+            DetailScreen(
+                eventId = eventId,
+                viewModel = eventDetailsViewModel,
+                navController = navController
+            )
+        }
     }
-
 }

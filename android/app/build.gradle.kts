@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
     implementation(libs.transport.api)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -81,6 +82,10 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.androidx.material.icons.extended)
+
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+
 
 
 }

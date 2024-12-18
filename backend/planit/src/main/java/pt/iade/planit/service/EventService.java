@@ -9,4 +9,5 @@ public interface EventService {
     List<EventDTO> findEventsByUserId(Integer userId);
     List<EventDTO> getAllEvents();  // New method for getting all events
     void deleteEventById(Integer eventId);  // New method for deleting an event by ID
+    EventDTO getEventDetails(Integer eventId);
 }

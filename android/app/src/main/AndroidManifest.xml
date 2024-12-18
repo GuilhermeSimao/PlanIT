@@ -16,6 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlanIT"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBSX-bx7nibRs-gIiJ_CJTdsAcB6EaS2dg" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

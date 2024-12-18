@@ -3,6 +3,7 @@ package pt.iade.planit.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pt.iade.planit.dto.EventDTO;
+import pt.iade.planit.dto.ParticipantDTO;
 import pt.iade.planit.entity.Event;
 import pt.iade.planit.entity.User;
 import pt.iade.planit.entity.Location;
@@ -104,6 +105,36 @@ public class EventServiceImpl implements EventService {
             return dto;
         }).toList();
     }
+
+    @Override
+    public EventDTO getEventDetails(Integer eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+
+        EventDTO dto = new EventDTO();
+        dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
+        dto.setDescription(event.getDescription());
+        dto.setDate(event.getDate());
+        dto.setPhotoUrl(event.getPhotoUrl());
+        dto.setUserId(event.getUser().getId());
+        dto.setUserName(event.getUser().getName());
+
+        if (event.getLocation() != null) {
+            dto.setLocationId(event.getLocation().getId());
+        }
+
+        dto.setParticipants(event.getParticipants().stream().map(participant -> {
+            ParticipantDTO participantDTO = new ParticipantDTO();
+            participantDTO.setUserId(participant.getUser().getId());
+            participantDTO.setUserName(participant.getUser().getName());
+            participantDTO.setStatus(participant.getStatus().toString());
+            return participantDTO;
+        }).toList());
+
+        return dto;
+    }
+
 
     @Override
     public void deleteEventById(Integer eventId) {

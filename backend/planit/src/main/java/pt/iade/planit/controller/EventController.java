@@ -40,6 +40,12 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDTO> getEventDetails(@PathVariable Integer id) {
+        EventDTO event = eventService.getEventDetails(id);
+        return ResponseEntity.ok(event);
+    }
+
     // Delete event by ID
     @DeleteMapping("/delete/{eventId}")
     public ResponseEntity<String> deleteEvent(@PathVariable Integer eventId) {
