@@ -40,4 +40,24 @@ public class ParticipantController {
         participantService.removeParticipant(participantId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/event/{eventId}/invite")
+    public ResponseEntity<ParticipantDTO> inviteParticipant(
+            @PathVariable Integer eventId,
+            @RequestParam String userEmail) {
+        return ResponseEntity.ok(participantService.inviteParticipant(eventId, userEmail));
+    }
+
+    @PatchMapping("/{participantId}/status")
+    public ResponseEntity<ParticipantDTO> updateParticipantStatus(
+            @PathVariable Integer participantId,
+            @RequestParam String status) {
+        return ResponseEntity.ok(participantService.updateParticipantStatus(participantId, status));
+    }
+
+    @GetMapping("/user/{userId}/pending")
+    public ResponseEntity<List<ParticipantDTO>> getPendingInvites(@PathVariable Integer userId) {
+        return ResponseEntity.ok(participantService.getPendingInvites(userId));
+    }
+
 }

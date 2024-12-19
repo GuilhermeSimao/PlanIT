@@ -44,28 +44,56 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                id?.let { userId -> navController.navigate(Screen.CreateEvent.withArgs(userId.toString())) }
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "Create Event")
-            }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        ) {
             if (loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else if (events.isEmpty()) {
                 EmptyStateMessage()
             } else {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f), // Espaço restante acima dos botões
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(events) { event ->
                         EventCard(event, navController)
                     }
+                }
+            }
+
+            // Botões "Criar Evento" e "Gerir Convites" alinhados lado a lado
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = {
+                        id?.let { userId ->
+                            navController.navigate(Screen.CreateEvent.withArgs(userId.toString()))
+                        }
+                    },
+                    modifier = Modifier.weight(1f).padding(end = 8.dp) // Espaçamento à direita
+                ) {
+                    Text("Criar Evento")
+                }
+
+                Button(
+                    onClick = {
+                        id?.let { userId ->
+                            println("Navigating to PendingInvites with userId: $userId")
+                            navController.navigate(Screen.PendingInvites.withArgs(userId.toString()))
+                        }
+                    },
+                    modifier = Modifier.weight(1f).padding(start = 8.dp) // Espaçamento à esquerda
+                ) {
+                    Text("Gerir Convites")
                 }
             }
         }

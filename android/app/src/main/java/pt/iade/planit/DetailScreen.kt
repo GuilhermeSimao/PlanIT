@@ -75,6 +75,18 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Criado por: ${eventDetails.userName}", style = MaterialTheme.typography.bodySmall)
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Botão "Gerir Participantes"
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Gerir Participantes")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text("Participantes:", style = MaterialTheme.typography.headlineSmall)
                 }
 

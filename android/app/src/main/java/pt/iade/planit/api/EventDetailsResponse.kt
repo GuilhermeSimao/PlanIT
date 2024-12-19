@@ -18,7 +18,10 @@ data class LocationResponse(
 )
 
 data class ParticipantResponse(
+    val id: Int,
     val userId: Int,
     val userName: String,
+    val eventId: Int,
+    val eventTitle: String,
     val status: String
 )

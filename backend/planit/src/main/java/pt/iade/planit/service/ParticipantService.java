@@ -10,4 +10,9 @@ public interface ParticipantService {
     List<ParticipantDTO> getParticipantsByEventId(Integer eventId);
     List<ParticipantDTO> getParticipantsByUserId(Integer userId);
     void removeParticipant(Integer participantId);
+    ParticipantDTO inviteParticipant(Integer eventId, String userEmail);
+    ParticipantDTO updateParticipantStatus(Integer participantId, String status);
+    List<ParticipantDTO> getPendingInvites(Integer userId);
+
+
 }

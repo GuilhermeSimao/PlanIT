@@ -2,8 +2,10 @@ package pt.iade.planit.api
 
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -22,4 +24,23 @@ interface ApiService {
     @GET("/event/{id}")
     suspend fun getEventDetails(@Path("id") eventId: Int): EventDetailsResponse
 
+    @POST("/participant/event/{eventId}/invite")
+    suspend fun inviteParticipant(
+        @Path("eventId") eventId: Int,
+        @Query("userEmail") userEmail: String
+    ): ParticipantResponse
+
+    @PATCH("/participant/{participantId}/status")
+    suspend fun updateParticipantStatus(
+        @Path("participantId") participantId: Int,
+        @Query("status") status: String
+    ): ParticipantResponse
+
+    @GET("/participant/event/{eventId}")
+    suspend fun getParticipantsByEventId(
+        @Path("eventId") eventId: Int
+    ): List<ParticipantResponse>
+
+    @GET("participant/user/{userId}/pending")
+    suspend fun getPendingInvites(@Path("userId") userId: Int): List<ParticipantResponse>
 }
