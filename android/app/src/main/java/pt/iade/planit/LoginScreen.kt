@@ -8,11 +8,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
 
     Column(
         modifier = Modifier
@@ -32,7 +37,7 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Senha") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
         )
@@ -41,12 +46,26 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController) {
 
         Button(
             onClick = {
-                if (email.isNotBlank() && password.isNotBlank()) {
-                    loginViewModel.loginUser(email, password){ userId ->
-                        navController.navigate(Screen.MainScreen.withArgs(userId.toString()))
+                when {
+                    email.isBlank() || password.isBlank() -> {
+                        errorMessage = "Preencha todos os campos."
                     }
-                } else {
-                    errorMessage = "Preencha todos os campos."
+                    !isValidEmail(email) -> {
+                        errorMessage = "E-mail inválido."
+                    }
+                    else -> {
+                        // Tenta logar o usuário
+                        loginViewModel.loginUser(email, password,
+                            onSuccess = { userId ->
+                                // Login bem-sucedido
+                                navController.navigate(Screen.MainScreen.withArgs(userId.toString()))
+                            },
+                            onError = { error ->
+                                // Mostra erro retornado do backend
+                                errorMessage = error
+                            }
+                        )
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -55,7 +74,11 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController) {
         }
 
         if (errorMessage.isNotBlank()) {
-            Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -65,3 +88,5 @@ fun LoginScreen(loginViewModel: LoginViewModel, navController: NavController) {
         }
     }
 }
+
+

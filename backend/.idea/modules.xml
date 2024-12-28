@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Projeto IADE PlanIT.iml" filepath="$PROJECT_DIR$/.idea/Projeto IADE PlanIT.iml" />
-      <module fileurl="file://$PROJECT_DIR$/planit/planit.iml" filepath="$PROJECT_DIR$/planit/planit.iml" />
     </modules>
   </component>
 </project>

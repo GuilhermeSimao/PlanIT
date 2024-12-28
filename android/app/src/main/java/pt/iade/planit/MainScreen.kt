@@ -52,10 +52,26 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 .fillMaxSize()
         ) {
             if (loading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                // Indicador de carregamento centralizado
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             } else if (events.isEmpty()) {
-                EmptyStateMessage()
+                // Mensagem de estado vazio centralizada
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center // Centraliza vertical e horizontalmente
+                ) {
+                    EmptyStateMessage()
+                }
             } else {
+                // Lista de eventos
                 LazyColumn(
                     modifier = Modifier.weight(1f), // Espaço restante acima dos botões
                     contentPadding = PaddingValues(8.dp)
@@ -66,7 +82,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 }
             }
 
-            // Botões "Criar Evento" e "Gerir Convites" alinhados lado a lado
+            // Botões "Criar Evento" e "Gerir Convites" sempre visíveis
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,6 +115,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
         }
     }
 }
+
 
 @Composable
 fun EventCard(event: Event, navController: NavController) {
@@ -134,12 +151,16 @@ fun EventCard(event: Event, navController: NavController) {
 @Composable
 fun EmptyStateMessage() {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp), // Reserva espaço para os botões na parte inferior
+        verticalArrangement = Arrangement.Center, // Centraliza verticalmente
+        horizontalAlignment = Alignment.CenterHorizontally // Centraliza horizontalmente
     ) {
         Icon(Icons.Default.Event, contentDescription = "No Events", modifier = Modifier.size(80.dp))
         Spacer(modifier = Modifier.height(16.dp))
         Text("No events found. Create a new event!", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
+

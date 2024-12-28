@@ -55,6 +55,42 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun loginUser(
+        email: String,
+        password: String,
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = RetrofitInstance.api.login(UserCredentials(email, password))
+                withContext(Dispatchers.Main) {
+                    onSuccess(response.id)
+                }
+            } catch (e: retrofit2.HttpException) {
+                // Trata erros HTTP com mensagens específicas
+                val errorMessage = when (e.code()) {
+                    400 -> "Requisição inválida. Verifique os dados fornecidos."
+                    401 -> "E-mail ou senha incorretos."
+                    403 -> "Acesso negado. Verifique suas permissões."
+                    404 -> "Usuário não encontrado."
+                    500 -> "Erro no servidor. Tente novamente mais tarde."
+                    else -> "Erro desconhecido: ${e.message()}"
+                }
+                withContext(Dispatchers.Main) {
+                    onError(errorMessage)
+                }
+            } catch (e: Exception) {
+                // Trata outros erros genéricos
+                withContext(Dispatchers.Main) {
+                    onError("Erro ao conectar ao servidor: ${e.message ?: "Erro desconhecido"}")
+                }
+            }
+        }
+    }
+
+
+
     fun createEvent(
         userId: Int,
         title: String,

@@ -19,10 +19,18 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun isPasswordStrong(password: String): Boolean {
+        return password.length >= 8 && password.any { it.isDigit() } && password.any { !it.isLetterOrDigit() }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Registar") },
+                title = { Text("Registrar") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
@@ -78,10 +86,16 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
 
             Button(
                 onClick = {
-                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank() && confirmPassword == password) {
-                        registerViewModel.registerUser(name, email, password)
-                    } else {
-                        errorMessage = "Preencha todos os campos e certifique-se de que as senhas coincidem."
+                    when {
+                        name.isBlank() -> errorMessage = "Preencha o nome."
+                        email.isBlank() || !isValidEmail(email) -> errorMessage = "E-mail inválido."
+                        password.isBlank() || !isPasswordStrong(password) -> errorMessage =
+                            "A senha deve ter no mínimo 8 caracteres, incluindo um número e um caractere especial."
+                        password != confirmPassword -> errorMessage = "As senhas não coincidem."
+                        else -> {
+                            registerViewModel.registerUser(name, email, password)
+                            navController.navigate(Screen.Login.route)
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

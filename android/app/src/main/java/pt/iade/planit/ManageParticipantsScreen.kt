@@ -57,16 +57,21 @@ fun ManageParticipantsScreen(
                     viewModel.inviteParticipant(eventId, emailToInvite, {
                         participants = participants + it
                         emailToInvite = ""
-                    }, { errorMessage = it })
+                        errorMessage = "" // Limpa a mensagem de erro no sucesso
+                    }, { error ->
+                        errorMessage = error // Exibe a mensagem de erro
+                    })
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Convidar Participante")
             }
 
+
             if (errorMessage.isNotBlank()) {
                 Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
             Text("Participantes:", style = MaterialTheme.typography.titleMedium)
