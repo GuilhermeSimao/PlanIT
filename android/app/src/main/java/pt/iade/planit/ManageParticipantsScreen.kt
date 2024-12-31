@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -92,41 +93,69 @@ fun ParticipantItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Text(text = participant.userName ?: "N/A", style = MaterialTheme.typography.bodyLarge)
-        Text(text = participant.status ?: "N/A", style = MaterialTheme.typography.bodySmall)
-        Box {
-            Button(onClick = { expanded = true }) {
-                Text("Ações")
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Coluna com Nome e Status
+            Column(
+                modifier = Modifier
+                    .weight(1f)
             ) {
-                DropdownMenuItem(
-                    text = { Text("Confirmar") },
-                    onClick = {
-                        viewModel.updateParticipantStatus(participant.id, "confirmed", {
-                            onUpdate() // Atualiza a lista de participantes
-                        }, {})
-                        expanded = false
-                    }
+                Text(
+                    text = participant.userName ?: "N/A",
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1
                 )
-                DropdownMenuItem(
-                    text = { Text("Recusar") },
-                    onClick = {
-                        viewModel.updateParticipantStatus(participant.id, "declined", {
-                            onUpdate() // Atualiza a lista de participantes
-                        }, {})
-                        expanded = false
-                    }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = participant.status ?: "N/A",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Botão de ações com Dropdown
+            Box {
+                Button(onClick = { expanded = true }) {
+                    Text("Ações")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Confirmar") },
+                        onClick = {
+                            viewModel.updateParticipantStatus(participant.id, "confirmed", {
+                                onUpdate() // Atualiza a lista de participantes
+                            }, {})
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Recusar") },
+                        onClick = {
+                            viewModel.updateParticipantStatus(participant.id, "declined", {
+                                onUpdate() // Atualiza a lista de participantes
+                            }, {})
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }
 }
+

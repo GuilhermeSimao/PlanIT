@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import pt.iade.planit.api.ParticipantResponse
@@ -26,33 +27,57 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
 
     Scaffold(
         topBar = {
-            CustomTopBar(
-                title = "Convites Pendentes",
-                showBackButton = true,
-                onBackClick = { navController.popBackStack() }
+            TopAppBar(
+                title = { Text("Gestão de Convites") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
+                    }
+                }
             )
         }
     ) { paddingValues ->
-        if (invites.isEmpty() && errorMessage.isBlank()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Sem convites pendentes.")
-            }
-        } else if (errorMessage.isNotBlank()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(errorMessage, color = MaterialTheme.colorScheme.error)
-            }
-        } else {
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
-                items(invites) { invite ->
-                    InviteItem(
-                        invite = invite,
-                        viewModel = viewModel,
-                        onUpdate = {
-                            viewModel.getPendingInvites(userId, { updatedInvites ->
-                                invites = updatedInvites
-                            }, { errorMessage = it })
-                        }
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(16.dp)
+                .fillMaxSize()
+        ) {
+            if (invites.isEmpty() && errorMessage.isBlank()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Sem convites pendentes.", textAlign = TextAlign.Center)
+                }
+            } else if (errorMessage.isNotBlank()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
                     )
+                }
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(invites) { invite ->
+                        InviteCard(
+                            invite = invite,
+                            onAccept = {
+                                viewModel.updateParticipantStatus(invite.id, "confirmed", {
+                                    invites = invites.filter { it.id != invite.id }
+                                }, { error -> errorMessage = error })
+                            },
+                            onDecline = {
+                                viewModel.updateParticipantStatus(invite.id, "declined", {
+                                    invites = invites.filter { it.id != invite.id }
+                                }, { error -> errorMessage = error })
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -60,33 +85,48 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
 }
 
 @Composable
-fun InviteItem(invite: ParticipantResponse, viewModel: ParticipantViewModel, onUpdate: () -> Unit) {
-    Row(
+fun InviteCard(
+    invite: ParticipantResponse,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit
+) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column {
-            Text(text = invite.eventTitle, style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Status: ${invite.status}", style = MaterialTheme.typography.bodySmall)
-        }
-
-        Row {
-            Button(onClick = {
-                viewModel.updateParticipantStatus(invite.id, "confirmed", {
-                    onUpdate()
-                }, {})
-            }) {
-                Text("Aceitar")
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = {
-                viewModel.updateParticipantStatus(invite.id, "declined", {
-                    onUpdate()
-                }, {})
-            }) {
-                Text("Recusar")
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = invite.eventTitle,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Status: ${invite.status}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = onAccept,
+                    modifier = Modifier.weight(1f).padding(end = 4.dp)
+                ) {
+                    Text("Aceitar")
+                }
+                Button(
+                    onClick = onDecline,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    modifier = Modifier.weight(1f).padding(start = 4.dp)
+                ) {
+                    Text("Recusar")
+                }
             }
         }
     }

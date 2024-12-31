@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -51,29 +54,97 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
         } else {
             val eventDetails = viewModel.eventDetails!!
 
-            LazyColumn(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 item {
-                    Text(eventDetails.title, style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(eventDetails.description, style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    // Imagem do evento
+                    Image(
+                        painter = rememberAsyncImagePainter(eventDetails.photoUrl),
+                        contentDescription = "Event Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
 
-                    if (eventDetails.photoUrl != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(eventDetails.photoUrl),
-                            contentDescription = "Event Image",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(180.dp),
-                            contentScale = ContentScale.Crop
-                        )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Título do evento
+                    Text(
+                        text = eventDetails.title,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Data e hora
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.CalendarToday, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = eventDetails.date, style = MaterialTheme.typography.bodyMedium)
+                    }
+
+                    // Localização
+                    eventDetails.location?.let {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Place, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = it.address, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Criado por: ${eventDetails.userName}", style = MaterialTheme.typography.bodySmall)
-                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Botão "Gerir Participantes"
+                    // Descrição
+                    Text(
+                        text = "Descrição:",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = eventDetails.description,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+
+                // Participantes
+                item {
+                    Text(
+                        text = "Participantes:",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                items(eventDetails.participants) { participant ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Person, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = participant.userName,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = participant.status,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                // Botão "Gerir Participantes"
+                item {
                     Button(
                         onClick = {
                             navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
@@ -81,21 +152,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Gerir Participantes")
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Participantes:", style = MaterialTheme.typography.headlineSmall)
-                }
-
-                items(eventDetails.participants) { participant ->
-                    Text("${participant.userName} (${participant.status})", style = MaterialTheme.typography.bodySmall)
-                }
-
-                if (eventDetails.location != null) {
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Localização: ${eventDetails.location.address}")
-                        // ADICIONAR MAPA
                     }
                 }
             }
