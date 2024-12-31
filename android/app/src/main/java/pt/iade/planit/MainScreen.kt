@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import pt.iade.planit.api.Event
 import coil.compose.AsyncImage
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.ui.layout.ContentScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,20 +120,25 @@ fun EventCard(event: Event, navController: NavController) {
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(event.title, style = MaterialTheme.typography.titleLarge)
-            Text(event.description, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
-            Text("Date: ${event.date}", style = MaterialTheme.typography.bodySmall)
-
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Ajusta a imagem para ocupar toda a largura do card
             if (!event.photoUrl.isNullOrEmpty()) {
                 AsyncImage(
                     model = event.photoUrl,
                     contentDescription = "Event Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
-                        .padding(top = 8.dp)
+                        .height(180.dp), // Define uma altura fixa
+                    contentScale = ContentScale.Crop // Corta ou ajusta a imagem para preencher o espaço
                 )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(event.title, style = MaterialTheme.typography.titleLarge)
+                Text(event.description, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
+                Text("Date: ${event.date}", style = MaterialTheme.typography.bodySmall)
             }
         }
     }
