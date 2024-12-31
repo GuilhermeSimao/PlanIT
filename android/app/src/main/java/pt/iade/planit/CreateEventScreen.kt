@@ -55,13 +55,10 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Create Event") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
+            CustomTopBar(
+                title = "Create Event",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
@@ -112,7 +109,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                             date = selectedDate
                         }
                     }) {
-                        Icon(Icons.Default.CalendarToday, contentDescription = "Pick Date")
+                        Icon(Icons.Default.CalendarToday, contentDescription = "Pick Date", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -133,7 +130,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                             time = selectedTime
                         }
                     }) {
-                        Icon(Icons.Default.AccessTime, contentDescription = "Pick Time")
+                        Icon(Icons.Default.AccessTime, contentDescription = "Pick Time", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
 

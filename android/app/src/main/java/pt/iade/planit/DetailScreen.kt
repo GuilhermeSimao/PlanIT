@@ -4,9 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
@@ -83,7 +81,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
 
                     // Data e hora
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.CalendarToday, contentDescription = null)
+                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = eventDetails.date, style = MaterialTheme.typography.bodyMedium)
                     }
@@ -92,7 +90,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     eventDetails.location?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Place, contentDescription = null)
+                            Icon(Icons.Default.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = it.address, style = MaterialTheme.typography.bodyMedium)
                         }
@@ -127,7 +125,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Person, contentDescription = null)
+                        Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
@@ -143,7 +141,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     }
                 }
 
-                // Botão "Gerir Participantes"
                 item {
                     Button(
                         onClick = {

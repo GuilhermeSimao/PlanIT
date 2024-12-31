@@ -1,10 +1,13 @@
 package pt.iade.planit
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -16,12 +19,17 @@ fun CustomTopBar(
     onLogoutClick: (() -> Unit)? = null
 ) {
     TopAppBar(
-        title = { Text(text = title) },
+        title = { Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onPrimary, // Contraste do texto
+            textAlign = TextAlign.Center, // Centraliza o texto
+            modifier = Modifier.fillMaxWidth() // Faz o texto ocupar toda a largura
+        ) },
         navigationIcon = {
             if (showBackButton) {
                 run {
                     IconButton(onClick = { onBackClick?.invoke() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar", tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             } else null
@@ -29,9 +37,12 @@ fun CustomTopBar(
         actions = {
             if (showLogoutButton) {
                 IconButton(onClick = { onLogoutClick?.invoke() }) {
-                    Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
+                    Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
                 }
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary // Cor de fundo roxa
+        )
     )
 }

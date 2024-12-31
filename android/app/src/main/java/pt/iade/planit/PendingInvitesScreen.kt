@@ -27,13 +27,10 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Gestão de Convites") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+            CustomTopBar(
+                title = "Gestão de Convites",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
