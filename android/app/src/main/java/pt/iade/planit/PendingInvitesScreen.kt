@@ -20,22 +20,16 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
     var invites by remember { mutableStateOf<List<ParticipantResponse>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
 
-    println("Opening PendingInvitesScreen for userId: $userId")
-
     LaunchedEffect(Unit) {
-        println("Loading invites for userId: $userId")
         viewModel.getPendingInvites(userId, { invites = it }, { errorMessage = it })
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Convites Pendentes") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+            CustomTopBar(
+                title = "Convites Pendentes",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->

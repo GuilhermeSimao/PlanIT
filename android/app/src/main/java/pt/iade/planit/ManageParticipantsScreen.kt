@@ -30,13 +30,10 @@ fun ManageParticipantsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Gerir Participantes") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+            CustomTopBar(
+                title = "Gerir Participantes",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
@@ -57,9 +54,9 @@ fun ManageParticipantsScreen(
                     viewModel.inviteParticipant(eventId, emailToInvite, {
                         participants = participants + it
                         emailToInvite = ""
-                        errorMessage = "" // Limpa a mensagem de erro no sucesso
+                        errorMessage = ""
                     }, { error ->
-                        errorMessage = error // Exibe a mensagem de erro
+                        errorMessage = error
                     })
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -67,11 +64,9 @@ fun ManageParticipantsScreen(
                 Text("Convidar Participante")
             }
 
-
             if (errorMessage.isNotBlank()) {
                 Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
             }
-
 
             Spacer(modifier = Modifier.height(16.dp))
             Text("Participantes:", style = MaterialTheme.typography.titleMedium)
@@ -79,7 +74,6 @@ fun ManageParticipantsScreen(
             LazyColumn {
                 items(participants) { participant ->
                     ParticipantItem(participant = participant, viewModel = viewModel, onUpdate = {
-                        // Atualiza a lista após mudança de status
                         viewModel.getParticipantsByEventId(eventId, { updatedParticipants ->
                             participants = updatedParticipants
                         }, { errorMessage = it })

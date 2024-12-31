@@ -34,15 +34,10 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Your Events") },
-                actions = {
-                    IconButton(onClick = {
-                        navController.navigate(Screen.Login.route)
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
-                    }
-                }
+            CustomTopBar(
+                title = "Seus Eventos",
+                showLogoutButton = true,
+                onLogoutClick = { navController.navigate(Screen.Login.route) }
             )
         }
     ) { paddingValues ->
@@ -52,7 +47,6 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 .fillMaxSize()
         ) {
             if (loading) {
-                // Indicador de carregamento centralizado
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -61,19 +55,17 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                     CircularProgressIndicator()
                 }
             } else if (events.isEmpty()) {
-                // Mensagem de estado vazio centralizada
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center // Centraliza vertical e horizontalmente
+                    contentAlignment = Alignment.Center
                 ) {
                     EmptyStateMessage()
                 }
             } else {
-                // Lista de eventos
                 LazyColumn(
-                    modifier = Modifier.weight(1f), // Espaço restante acima dos botões
+                    modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(events) { event ->
@@ -82,7 +74,6 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 }
             }
 
-            // Botões "Criar Evento" e "Gerir Convites" sempre visíveis
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,7 +86,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                             navController.navigate(Screen.CreateEvent.withArgs(userId.toString()))
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(end = 8.dp) // Espaçamento à direita
+                    modifier = Modifier.weight(1f).padding(end = 8.dp)
                 ) {
                     Text("Criar Evento")
                 }
@@ -103,11 +94,10 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 Button(
                     onClick = {
                         id?.let { userId ->
-                            println("Navigating to PendingInvites with userId: $userId")
                             navController.navigate(Screen.PendingInvites.withArgs(userId.toString()))
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp) // Espaçamento à esquerda
+                    modifier = Modifier.weight(1f).padding(start = 8.dp)
                 ) {
                     Text("Gerir Convites")
                 }

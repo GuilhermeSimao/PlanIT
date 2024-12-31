@@ -33,13 +33,10 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Detalhes do Evento") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+            CustomTopBar(
+                title = "Detalhes do Evento",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->

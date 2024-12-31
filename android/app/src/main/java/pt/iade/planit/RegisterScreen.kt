@@ -5,9 +5,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,23 +22,12 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun isPasswordStrong(password: String): Boolean {
-        return password.length >= 8 && password.any { it.isDigit() } && password.any { !it.isLetterOrDigit() }
-    }
-
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Registrar") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+            CustomTopBar(
+                title = "PlanIT - Registro",
+                showBackButton = true,
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
@@ -88,13 +80,11 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
                 onClick = {
                     when {
                         name.isBlank() -> errorMessage = "Preencha o nome."
-                        email.isBlank() || !isValidEmail(email) -> errorMessage = "E-mail inválido."
-                        password.isBlank() || !isPasswordStrong(password) -> errorMessage =
-                            "A senha deve ter no mínimo 8 caracteres, incluindo um número e um caractere especial."
+                        email.isBlank() -> errorMessage = "Preencha o email."
                         password != confirmPassword -> errorMessage = "As senhas não coincidem."
                         else -> {
                             registerViewModel.registerUser(name, email, password)
-                            navController.navigate(Screen.Login.route)
+                            navController.popBackStack()
                         }
                     }
                 },
@@ -109,7 +99,7 @@ fun RegisterScreen(registerViewModel: LoginViewModel, navController: NavControll
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = { navController.navigate(Screen.Login.route) }) {
+            TextButton(onClick = { navController.popBackStack() }) {
                 Text("Já tem uma conta? Faça login aqui.")
             }
         }
