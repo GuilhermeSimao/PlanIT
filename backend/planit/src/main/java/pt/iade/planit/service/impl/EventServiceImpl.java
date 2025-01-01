@@ -28,16 +28,16 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void createEvent(EventDTO eventDto) {
-        // Validate User ID
+        // Valida o ID do usuário
         if (eventDto.getUserId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
-        // Fetch the User entity
+        // Busca o usuário
         User user = userRepository.findById(eventDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + eventDto.getUserId()));
 
-        // Initialize the Event entity
+        // Cria o evento
         Event event = new Event();
         event.setTitle(eventDto.getTitle());
         event.setDescription(eventDto.getDescription());
@@ -45,41 +45,48 @@ public class EventServiceImpl implements EventService {
         event.setPhotoUrl(eventDto.getPhotoUrl());
         event.setUser(user);
 
-        // Fetch Location (optional)
-        if (eventDto.getLocationId() != null) {
-            Location location = locationRepository.findById(eventDto.getLocationId())
-                    .orElseThrow(() -> new RuntimeException("Location not found with ID: " + eventDto.getLocationId()));
-            event.setLocation(location);
+        // Verifica e salva a localização
+        if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
+            Location location = new Location();
+            location.setLatitude(eventDto.getLatitude());
+            location.setLongitude(eventDto.getLongitude());
+            location.setAddress(eventDto.getAddress());
+
+            Location savedLocation = locationRepository.save(location);
+            event.setLocation(savedLocation); // Vincula a localização ao evento
         }
 
-        // Save and return the event
+        // Salva o evento
         eventRepository.save(event);
     }
+
 
     @Override
     public List<EventDTO> findEventsByUserId(Integer userId) {
         List<Event> events = eventRepository.findByUserId(userId);
 
-        // Map Events to EventDTO
         return events.stream().map(event -> {
             EventDTO dto = new EventDTO();
             dto.setId(event.getId());
             dto.setTitle(event.getTitle());
             dto.setDescription(event.getDescription());
             dto.setDate(event.getDate());
-            dto.setPhotoUrl(event.getPhotoUrl() != null ? event.getPhotoUrl() : "https://example.com/images/default.jpg");
-
-            dto.setUserId(event.getUser().getId());       // Set user ID
-            dto.setUserName(event.getUser().getName().trim());   // Set username
-            dto.setUserEmail(event.getUser().getEmail()); // Set user email
+            dto.setPhotoUrl(event.getPhotoUrl());
+            dto.setUserId(event.getUser().getId());
+            dto.setUserName(event.getUser().getName());
+            dto.setUserEmail(event.getUser().getEmail());
 
             if (event.getLocation() != null) {
                 dto.setLocationId(event.getLocation().getId());
+                dto.setLatitude(event.getLocation().getLatitude());
+                dto.setLongitude(event.getLocation().getLongitude());
+                dto.setAddress(event.getLocation().getAddress());
             }
 
             return dto;
         }).toList();
     }
+
 
     @Override
     public List<EventDTO> getAllEvents() {
@@ -122,6 +129,9 @@ public class EventServiceImpl implements EventService {
 
         if (event.getLocation() != null) {
             dto.setLocationId(event.getLocation().getId());
+            dto.setAddress(event.getLocation().getAddress());
+            dto.setLatitude(event.getLocation().getLatitude());
+            dto.setLongitude(event.getLocation().getLongitude());
         }
 
         dto.setParticipants(event.getParticipants().stream().map(participant -> {

@@ -30,4 +30,8 @@ public class EventDTO {
     // List of participants
     @JsonProperty("participants")
     private List<ParticipantDTO> participants;
+
+    private String address;
+    private Double latitude;
+    private Double longitude;
 }
