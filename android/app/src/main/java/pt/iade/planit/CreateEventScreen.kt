@@ -12,9 +12,13 @@ import android.app.TimePickerDialog
 import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import java.util.*
 
 fun showDatePicker(context: Context, onDateSelected: (String) -> Unit) {
@@ -48,10 +52,17 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var photoUrl by remember { mutableStateOf("") }
+    var latitude by remember { mutableStateOf(38.71667) } // Valor inicial para Lisboa
+    var longitude by remember { mutableStateOf(-9.13333) }
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val initialPosition = LatLng(latitude, longitude)
+    val cameraPositionState = rememberCameraPositionState {
+        position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(initialPosition, 10f)
+    }
+    val markerState = rememberMarkerState(position = initialPosition)
 
     Scaffold(
         topBar = {
@@ -66,14 +77,15 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center // Centraliza o formulário vertical e horizontalmente
+            contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center // Alinha o conteúdo ao centro verticalmente
+                verticalArrangement = Arrangement.Center
             ) {
+                // Título
                 TextField(
                     value = title,
                     onValueChange = { title = it },
@@ -84,6 +96,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Descrição
                 TextField(
                     value = description,
                     onValueChange = { description = it },
@@ -94,7 +107,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Botão para escolher a data
+                // Escolha da Data
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextField(
                         value = date,
@@ -102,12 +115,10 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                         label = { Text("Date") },
                         placeholder = { Text("yyyy-MM-dd") },
                         modifier = Modifier.weight(1f),
-                        enabled = false // Apenas exibido
+                        enabled = false
                     )
                     IconButton(onClick = {
-                        showDatePicker(context) { selectedDate ->
-                            date = selectedDate
-                        }
+                        showDatePicker(context) { selectedDate -> date = selectedDate }
                     }) {
                         Icon(Icons.Default.CalendarToday, contentDescription = "Pick Date", tint = MaterialTheme.colorScheme.primary)
                     }
@@ -115,7 +126,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Botão para escolher a hora
+                // Escolha da Hora
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextField(
                         value = time,
@@ -123,12 +134,10 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                         label = { Text("Time") },
                         placeholder = { Text("HH:mm") },
                         modifier = Modifier.weight(1f),
-                        enabled = false // Apenas exibido
+                        enabled = false
                     )
                     IconButton(onClick = {
-                        showTimePicker(context) { selectedTime ->
-                            time = selectedTime
-                        }
+                        showTimePicker(context) { selectedTime -> time = selectedTime }
                     }) {
                         Icon(Icons.Default.AccessTime, contentDescription = "Pick Time", tint = MaterialTheme.colorScheme.primary)
                     }
@@ -136,6 +145,30 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Mapa para seleção de localização
+                Text("Select Location", style = MaterialTheme.typography.titleMedium)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(vertical = 8.dp)
+                ) {
+                    GoogleMap(
+                        cameraPositionState = cameraPositionState,
+                        modifier = Modifier.fillMaxSize(),
+                        onMapClick = { position ->
+                            latitude = position.latitude
+                            longitude = position.longitude
+                            markerState.position = position
+                        }
+                    ) {
+                        Marker(state = markerState)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // URL da foto
                 TextField(
                     value = photoUrl,
                     onValueChange = { photoUrl = it },
@@ -146,6 +179,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Botão de Criação do Evento
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
@@ -155,19 +189,31 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                                 isLoading = true
                                 val dateTime = "${date}T$time"
                                 loginViewModel.createEvent(
-                                    userId, title, description, dateTime, photoUrl
-                                ) {
-                                    isLoading = false
-                                    navController.popBackStack()
-                                }
+                                    userId = userId,
+                                    title = title,
+                                    description = description,
+                                    date = dateTime,
+                                    photoUrl = photoUrl,
+                                    latitude = latitude,
+                                    longitude = longitude,
+                                    onSuccess = {
+                                        isLoading = false
+                                        navController.popBackStack()
+                                    },
+                                    onError = { error ->
+                                        isLoading = false
+                                        errorMessage = error
+                                    }
+                                )
                             } else {
-                                errorMessage = "Please fill in all required fields."
+                                errorMessage = "Preencha todos os campos obrigatórios."
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Create Event")
                     }
+
                 }
 
                 if (errorMessage.isNotBlank()) {

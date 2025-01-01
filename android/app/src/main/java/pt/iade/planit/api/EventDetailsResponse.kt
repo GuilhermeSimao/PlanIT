@@ -8,7 +8,9 @@ data class EventDetailsResponse(
     val photoUrl: String?,
     val userName: String,
     val location: LocationResponse?,
-    val participants: List<ParticipantResponse>
+    val participants: List<ParticipantResponse>,
+    val latitude: Double?,
+    val longitude: Double?
 )
 
 data class LocationResponse(

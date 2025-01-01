@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pt.iade.planit.api.Event
+import pt.iade.planit.api.EventDetailsResponse
 import pt.iade.planit.api.RetrofitInstance
 import pt.iade.planit.api.User
 import pt.iade.planit.api.UserCredentials
@@ -89,6 +90,24 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun getEventDetails(
+        eventId: Int,
+        onSuccess: (EventDetailsResponse) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val eventDetails = RetrofitInstance.api.getEventDetails(eventId)
+                withContext(Dispatchers.Main) {
+                    onSuccess(eventDetails)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError("Failed to load event details: ${e.message}")
+                }
+            }
+        }
+    }
 
 
     fun createEvent(
@@ -97,19 +116,44 @@ class LoginViewModel : ViewModel() {
         description: String,
         date: String,
         photoUrl: String?,
-        onSuccess: () -> Unit
+        latitude: Double,
+        longitude: Double,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        // Criação do objeto de evento com localização
+        val event = Event(
+            userId = userId,
+            title = title,
+            description = description,
+            date = date,
+            photoUrl = photoUrl,
+            latitude = latitude,
+            longitude = longitude
+        )
+
+        // Fazer a requisição para criar o evento
+        viewModelScope.launch {
             try {
-                val event = Event(0, title, description, date, photoUrl, userId, null)
                 RetrofitInstance.api.createEvent(event)
-                withContext(Dispatchers.Main) {
-                    onSuccess()
+                onSuccess() // Chama onSuccess caso o evento seja criado com sucesso
+            } catch (e: retrofit2.HttpException) {
+                val errorMessage = when (e.code()) {
+                    400 -> "Dados inválidos. Verifique os campos."
+                    401 -> "Usuário não autorizado."
+                    403 -> "Acesso negado."
+                    404 -> "Recurso não encontrado."
+                    500 -> "Erro no servidor. Tente novamente mais tarde."
+                    else -> "Erro desconhecido: ${e.message}"
                 }
+                onError(errorMessage)
             } catch (e: Exception) {
-                Log.e("CreateEvent", "Error creating event", e)
+                onError("Erro ao conectar com o servidor: ${e.message ?: "Erro desconhecido"}")
             }
         }
     }
+
+
+
 }
 

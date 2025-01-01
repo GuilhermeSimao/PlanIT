@@ -83,8 +83,7 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
 
-    implementation(libs.maps.compose)
-    implementation(libs.play.services.maps)
+    implementation("com.google.maps.android:maps-compose:6.2.1")
 
 
 

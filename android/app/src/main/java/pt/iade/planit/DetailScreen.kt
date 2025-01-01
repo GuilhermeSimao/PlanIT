@@ -16,6 +16,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+fun formatDate(dateString: String): String {
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd 'de' MMMM 'de' yyyy, HH:mm", Locale.getDefault())
+        val date = inputFormat.parse(dateString)
+        date?.let { outputFormat.format(it) } ?: dateString
+    } catch (e: Exception) {
+        dateString // Retorna o original caso haja erro
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +79,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    // Imagem do evento
+                    // Event Image
                     Image(
                         painter = rememberAsyncImagePainter(eventDetails.photoUrl),
                         contentDescription = "Event Image",
@@ -70,35 +89,47 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         contentScale = ContentScale.Crop
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Título do evento
+                    // Event Title
                     Text(
                         text = eventDetails.title,
                         style = MaterialTheme.typography.headlineMedium
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
 
-                    // Data e hora
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Event Date and Time
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            Icons.Default.CalendarToday,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = eventDetails.date, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = formatDate(eventDetails.date), // Formata a data
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
 
-                    // Localização
+                    // Event Location
                     eventDetails.location?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Icon(
+                                Icons.Default.Place,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = it.address, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = it.address ?: "No Address Available",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
 
+                    // Event Description
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Descrição
                     Text(
                         text = "Descrição:",
                         style = MaterialTheme.typography.titleMedium
@@ -110,7 +141,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     )
                 }
 
-                // Participantes
+                // Participants Section
                 item {
                     Text(
                         text = "Participantes:",
@@ -125,7 +156,11 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
                             Text(
@@ -141,6 +176,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     }
                 }
 
+                // Manage Participants Button
                 item {
                     Button(
                         onClick = {
@@ -151,7 +187,49 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         Text("Gerir Participantes")
                     }
                 }
+
+                // Map Section with Event Latitude and Longitude
+                item {
+                    eventDetails.latitude?.let { lat ->
+                        eventDetails.longitude?.let { lng ->
+                            Spacer(modifier = Modifier.height(16.dp))
+                            GoogleMapView(latitude = lat, longitude = lng)
+                        }
+                    } ?: run {
+                        Text(
+                            text = "Localização indisponível.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         }
     }
 }
+
+@Composable
+fun GoogleMapView(latitude: Double, longitude: Double) {
+    val location = LatLng(latitude, longitude)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(location, 15f)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+    ) {
+        GoogleMap(
+            modifier = Modifier.matchParentSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            Marker(
+                state = rememberMarkerState(position = location),
+                title = "Local do Evento",
+                snippet = "Latitude: $latitude, Longitude: $longitude"
+            )
+        }
+    }
+}
+
