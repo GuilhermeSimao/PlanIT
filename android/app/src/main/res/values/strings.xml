@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PlanIT</string>
+    <string name="google_maps_key">AIzaSyBSX-bx7nibRs-gIiJ_CJTdsAcB6EaS2dg</string>
 </resources>

@@ -14,11 +14,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
+import pt.iade.planit.api.GeocodingHelper
 import java.util.*
 
 fun showDatePicker(context: Context, onDateSelected: (String) -> Unit) {
@@ -44,7 +47,6 @@ fun showTimePicker(context: Context, onTimeSelected: (String) -> Unit) {
     }, hour, minute, true).show()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewModel, userId: Int) {
     var title by remember { mutableStateOf("") }
@@ -52,17 +54,13 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var photoUrl by remember { mutableStateOf("") }
-    var latitude by remember { mutableStateOf(38.71667) } // Valor inicial para Lisboa
-    var longitude by remember { mutableStateOf(-9.13333) }
+    var address by remember { mutableStateOf("") }
+    var latitude by remember { mutableStateOf(0.0) }
+    var longitude by remember { mutableStateOf(0.0) }
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val initialPosition = LatLng(latitude, longitude)
-    val cameraPositionState = rememberCameraPositionState {
-        position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(initialPosition, 10f)
-    }
-    val markerState = rememberMarkerState(position = initialPosition)
 
     Scaffold(
         topBar = {
@@ -145,26 +143,14 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Mapa para seleção de localização
-                Text("Select Location", style = MaterialTheme.typography.titleMedium)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(vertical = 8.dp)
-                ) {
-                    GoogleMap(
-                        cameraPositionState = cameraPositionState,
-                        modifier = Modifier.fillMaxSize(),
-                        onMapClick = { position ->
-                            latitude = position.latitude
-                            longitude = position.longitude
-                            markerState.position = position
-                        }
-                    ) {
-                        Marker(state = markerState)
-                    }
-                }
+                // Morada
+                TextField(
+                    value = address,
+                    onValueChange = { address = it },
+                    label = { Text("Address") },
+                    placeholder = { Text("Enter event address") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -185,26 +171,39 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                 } else {
                     Button(
                         onClick = {
-                            if (title.isNotBlank() && description.isNotBlank() && date.isNotBlank() && time.isNotBlank()) {
+                            if (title.isNotBlank() && description.isNotBlank() && date.isNotBlank() && time.isNotBlank() && address.isNotBlank()) {
                                 isLoading = true
                                 val dateTime = "${date}T$time"
-                                loginViewModel.createEvent(
-                                    userId = userId,
-                                    title = title,
-                                    description = description,
-                                    date = dateTime,
-                                    photoUrl = photoUrl,
-                                    latitude = latitude,
-                                    longitude = longitude,
-                                    onSuccess = {
+
+                                // Chamar a função de geocodificação para obter as coordenadas
+                                loginViewModel.viewModelScope.launch {
+                                    val coordinates = GeocodingHelper.getCoordinates(context, address) // Adicione o 'context'
+                                    if (coordinates != null) {
+                                        latitude = coordinates.first
+                                        longitude = coordinates.second
+
+                                        loginViewModel.createEvent(
+                                            userId = userId,
+                                            title = title,
+                                            description = description,
+                                            date = dateTime,
+                                            photoUrl = photoUrl,
+                                            latitude = latitude,
+                                            longitude = longitude,
+                                            onSuccess = {
+                                                isLoading = false
+                                                navController.popBackStack()
+                                            },
+                                            onError = { error ->
+                                                isLoading = false
+                                                errorMessage = error
+                                            }
+                                        )
+                                    } else {
                                         isLoading = false
-                                        navController.popBackStack()
-                                    },
-                                    onError = { error ->
-                                        isLoading = false
-                                        errorMessage = error
+                                        errorMessage = "Failed to retrieve location coordinates."
                                     }
-                                )
+                                }
                             } else {
                                 errorMessage = "Preencha todos os campos obrigatórios."
                             }
@@ -213,7 +212,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                     ) {
                         Text("Create Event")
                     }
-
                 }
 
                 if (errorMessage.isNotBlank()) {
@@ -223,3 +221,4 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
         }
     }
 }
+

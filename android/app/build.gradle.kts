@@ -61,20 +61,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Retrofit
     implementation(libs.retrofit)
+
     implementation(libs.converter.gson)
 
-    // OkHttp (para logging)
     implementation(libs.logging.interceptor)
 
-    // Coroutines (necessário para Retrofit funcionar de forma assíncrona)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Compose ViewModel support
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Navegação (Navigation Component)
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.navigation.compose.v253)
@@ -85,6 +81,8 @@ dependencies {
 
     implementation("com.google.maps.android:maps-compose:6.2.1")
 
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
 
+    implementation ("com.google.code.gson:gson:2.10")
 
 }
