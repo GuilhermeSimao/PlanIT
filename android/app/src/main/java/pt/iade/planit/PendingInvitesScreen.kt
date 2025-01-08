@@ -1,10 +1,9 @@
 package pt.iade.planit
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,6 +62,9 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
                     items(invites) { invite ->
                         InviteCard(
                             invite = invite,
+                            onCardClick = { eventId ->
+                                navController.navigate(Screen.DetailScreen.withArgs(eventId.toString()))
+                            },
                             onAccept = {
                                 viewModel.updateParticipantStatus(invite.id, "confirmed", {
                                     invites = invites.filter { it.id != invite.id }
@@ -84,13 +86,15 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
 @Composable
 fun InviteCard(
     invite: ParticipantResponse,
+    onCardClick: (Int) -> Unit,
     onAccept: () -> Unit,
     onDecline: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onCardClick(invite.eventId) },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
