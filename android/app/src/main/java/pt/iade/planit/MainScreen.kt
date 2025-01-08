@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -84,51 +84,89 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                 }
             }
 
-            Row(
+            ActionMenu(id = id, navController = navController)
+        }
+    }
+}
+
+@Composable
+fun ActionMenu(id: Int?, navController: NavController) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        Button(
+            onClick = { isExpanded = !isExpanded },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(if (isExpanded) "Ocultar Ações" else "Mostrar Ações")
+        }
+
+        if (isExpanded) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
+                OutlinedButton(
                     onClick = {
                         id?.let { userId ->
                             navController.navigate(Screen.CreateEvent.withArgs(userId.toString()))
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(end = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Criar Evento",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Criar Evento")
                 }
 
-                Button(
+                OutlinedButton(
                     onClick = {
                         id?.let { userId ->
                             navController.navigate(Screen.PendingInvites.withArgs(userId.toString()))
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp, end = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Gerir Convites",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Gerir Convites")
                 }
 
-                Button(
+                OutlinedButton(
                     onClick = {
                         id?.let { userId ->
                             navController.navigate("confirmed_events/$userId")
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = "Eventos Confirmados",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Eventos Confirmados")
                 }
-
             }
-
         }
     }
 }
-
 
 @Composable
 fun EventCard(event: Event, navController: NavController) {
@@ -142,25 +180,22 @@ fun EventCard(event: Event, navController: NavController) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Imagem com largura total do Card
             if (!event.photoUrl.isNullOrEmpty()) {
                 AsyncImage(
                     model = event.photoUrl,
                     contentDescription = "Event Image",
                     modifier = Modifier
-                        .fillMaxWidth() // Garante largura total do card
-                        .height(180.dp), // Altura fixa para manter o layout consistente
-                    contentScale = ContentScale.Crop // Faz a imagem preencher toda a área
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentScale = ContentScale.Crop
                 )
             }
 
-            // Detalhes do evento
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                // Título
                 Text(
                     text = event.title,
                     style = MaterialTheme.typography.titleLarge,
@@ -170,7 +205,6 @@ fun EventCard(event: Event, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Descrição
                 Text(
                     text = event.description,
                     style = MaterialTheme.typography.bodyMedium,
@@ -180,7 +214,6 @@ fun EventCard(event: Event, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Data com ícone
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -198,7 +231,6 @@ fun EventCard(event: Event, navController: NavController) {
                 }
             }
 
-            // Botão com largura total
             Button(
                 onClick = {
                     navController.navigate(Screen.DetailScreen.withArgs(event.id.toString()))
@@ -213,7 +245,6 @@ fun EventCard(event: Event, navController: NavController) {
     }
 }
 
-// Formatação da data para um formato mais amigável
 fun formatEventDate(dateString: String): String {
     return try {
         val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
@@ -221,7 +252,7 @@ fun formatEventDate(dateString: String): String {
         val date = inputFormat.parse(dateString)
         outputFormat.format(date)
     } catch (e: Exception) {
-        dateString // Caso haja erro, retorna a string original
+        dateString
     }
 }
 
@@ -239,5 +270,3 @@ fun EmptyStateMessageMain() {
         Text("No events found. Create a new event!", style = MaterialTheme.typography.bodyLarge)
     }
 }
-
-
