@@ -90,6 +90,23 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun getConfirmedEvents(userId: Int, onResult: (List<Event>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val events = RetrofitInstance.api.getConfirmedEvents(userId)
+                withContext(Dispatchers.Main) {
+                    onResult(events)
+                }
+            } catch (e: Exception) {
+                Log.e("ConfirmedEvents", "Erro ao buscar eventos confirmados", e)
+                withContext(Dispatchers.Main) {
+                    onResult(emptyList())
+                }
+            }
+        }
+    }
+
+
     fun getEventDetails(
         eventId: Int,
         onSuccess: (EventDetailsResponse) -> Unit,

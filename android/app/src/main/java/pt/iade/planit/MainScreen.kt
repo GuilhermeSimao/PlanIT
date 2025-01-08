@@ -71,7 +71,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    EmptyStateMessage()
+                    EmptyStateMessageMain()
                 }
             } else {
                 LazyColumn(
@@ -107,11 +107,24 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                             navController.navigate(Screen.PendingInvites.withArgs(userId.toString()))
                         }
                     },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                    modifier = Modifier.weight(1f).padding(start = 8.dp, end = 8.dp)
                 ) {
                     Text("Gerir Convites")
                 }
+
+                Button(
+                    onClick = {
+                        id?.let { userId ->
+                            navController.navigate("confirmed_events/$userId")
+                        }
+                    },
+                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                ) {
+                    Text("Eventos Confirmados")
+                }
+
             }
+
         }
     }
 }
@@ -213,7 +226,7 @@ fun formatEventDate(dateString: String): String {
 }
 
 @Composable
-fun EmptyStateMessage() {
+fun EmptyStateMessageMain() {
     Column(
         modifier = Modifier
             .fillMaxSize()

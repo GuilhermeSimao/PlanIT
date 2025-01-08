@@ -42,7 +42,11 @@ public class EventServiceImpl implements EventService {
         event.setTitle(eventDto.getTitle());
         event.setDescription(eventDto.getDescription());
         event.setDate(eventDto.getDate());
-        event.setPhotoUrl(eventDto.getPhotoUrl());
+
+        // Adiciona uma imagem padrão se o photoUrl for nulo ou vazio
+        String defaultImageUrl = "https://lh3.googleusercontent.com/proxy/yWa9el0QN4WLu-qDs1CGZQoCfyN15OalYcYKiVOcvR1084frMFWjIrF2O0SQ83Ft-yTNaIKqjDLZ8p389g6P290ukkn4jj4rKDmiRmeFeIsVZgbHKe2XchNwyHwK_i7YZzPbZZSjuMPIcohOywArQyspLiL-KNBS9ugpIiIk"; // Substitua pelo seu URL de imagem padrão
+        event.setPhotoUrl(eventDto.getPhotoUrl() != null && !eventDto.getPhotoUrl().isEmpty() ? eventDto.getPhotoUrl() : defaultImageUrl);
+
         event.setUser(user);
 
         // Verifica e salva a localização
@@ -59,6 +63,7 @@ public class EventServiceImpl implements EventService {
         // Salva o evento
         eventRepository.save(event);
     }
+
 
 
     @Override
@@ -153,4 +158,82 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
         eventRepository.delete(event);
     }
+
+    @Override
+    public List<EventDTO> searchEvents(String title, String description, String date, String address) {
+        List<Event> filteredEvents = eventRepository.findAll(); // Começa com todos os eventos
+
+        if (title != null && !title.isEmpty()) {
+            filteredEvents = filteredEvents.stream()
+                    .filter(event -> event.getTitle().toLowerCase().contains(title.toLowerCase()))
+                    .toList();
+        }
+
+        if (description != null && !description.isEmpty()) {
+            filteredEvents = filteredEvents.stream()
+                    .filter(event -> event.getDescription() != null &&
+                            event.getDescription().toLowerCase().contains(description.toLowerCase()))
+                    .toList();
+        }
+
+        if (date != null && !date.isEmpty()) {
+            filteredEvents = filteredEvents.stream()
+                    .filter(event -> event.getDate().toLocalDate().toString().equals(date))
+                    .toList();
+        }
+
+        if (address != null && !address.isEmpty()) {
+            filteredEvents = filteredEvents.stream()
+                    .filter(event -> event.getLocation() != null &&
+                            event.getLocation().getAddress().toLowerCase().contains(address.toLowerCase()))
+                    .toList();
+        }
+
+        // Converte para DTO
+        return filteredEvents.stream().map(event -> {
+            EventDTO dto = new EventDTO();
+            dto.setId(event.getId());
+            dto.setTitle(event.getTitle());
+            dto.setDescription(event.getDescription());
+            dto.setDate(event.getDate());
+            dto.setPhotoUrl(event.getPhotoUrl());
+            dto.setUserId(event.getUser().getId());
+            dto.setUserName(event.getUser().getName());
+
+            if (event.getLocation() != null) {
+                dto.setAddress(event.getLocation().getAddress());
+                dto.setLatitude(event.getLocation().getLatitude());
+                dto.setLongitude(event.getLocation().getLongitude());
+            }
+
+            return dto;
+        }).toList();
+    }
+
+    @Override
+    public List<EventDTO> findConfirmedParticipatingEvents(Integer userId) {
+        List<Event> events = eventRepository.findConfirmedParticipatingEvents(userId);
+
+        return events.stream().map(event -> {
+            EventDTO dto = new EventDTO();
+            dto.setId(event.getId());
+            dto.setTitle(event.getTitle());
+            dto.setDescription(event.getDescription());
+            dto.setDate(event.getDate());
+            dto.setPhotoUrl(event.getPhotoUrl());
+            dto.setUserId(event.getUser().getId());
+            dto.setUserName(event.getUser().getName());
+            dto.setUserEmail(event.getUser().getEmail());
+
+            if (event.getLocation() != null) {
+                dto.setLatitude(event.getLocation().getLatitude());
+                dto.setLongitude(event.getLocation().getLongitude());
+                dto.setAddress(event.getLocation().getAddress());
+            }
+
+            return dto;
+        }).toList();
+    }
+
+
 }

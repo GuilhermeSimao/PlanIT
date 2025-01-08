@@ -52,4 +52,23 @@ public class EventController {
         eventService.deleteEventById(eventId);
         return ResponseEntity.ok("Event successfully deleted");
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<EventDTO>> searchEvents(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String address
+    ) {
+        List<EventDTO> events = eventService.searchEvents(title, description, date, address);
+        return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/participating/confirmed/{userId}")
+    public ResponseEntity<List<EventDTO>> getConfirmedParticipatingEvents(@PathVariable Integer userId) {
+        List<EventDTO> events = eventService.findConfirmedParticipatingEvents(userId);
+        return ResponseEntity.ok(events);
+    }
+
+
 }

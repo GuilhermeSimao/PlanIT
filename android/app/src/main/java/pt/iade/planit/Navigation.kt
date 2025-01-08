@@ -94,5 +94,17 @@ fun Navigation() {
             )
         }
 
+        composable(
+            route = "confirmed_events/{userId}",
+            arguments = listOf(navArgument("userId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getInt("userId") ?: 0
+            ConfirmedEventsScreen(
+                userId = userId,
+                loginViewModel = loginViewModel,
+                navController = navController
+            )
+        }
+
     }
 }

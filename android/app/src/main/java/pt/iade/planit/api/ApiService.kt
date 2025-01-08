@@ -43,4 +43,7 @@ interface ApiService {
 
     @GET("participant/user/{userId}/pending")
     suspend fun getPendingInvites(@Path("userId") userId: Int): List<ParticipantResponse>
+
+    @GET("/event/participating/confirmed/{userId}")
+    suspend fun getConfirmedEvents(@Path("userId") userId: Int): List<Event>
 }
