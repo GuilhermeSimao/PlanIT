@@ -15,11 +15,6 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import pt.iade.planit.api.GeocodingHelper
 import java.util.*
@@ -83,7 +78,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.Center
             ) {
-                // Título
                 TextField(
                     value = title,
                     onValueChange = { title = it },
@@ -94,7 +88,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Descrição
                 TextField(
                     value = description,
                     onValueChange = { description = it },
@@ -105,7 +98,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Escolha da Data
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextField(
                         value = date,
@@ -124,7 +116,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Escolha da Hora
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextField(
                         value = time,
@@ -143,7 +134,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Morada
                 TextField(
                     value = address,
                     onValueChange = { address = it },
@@ -154,7 +144,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // URL da foto
                 TextField(
                     value = photoUrl,
                     onValueChange = { photoUrl = it },
@@ -165,7 +154,6 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botão de Criação do Evento
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else {
@@ -175,9 +163,8 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                                 isLoading = true
                                 val dateTime = "${date}T$time"
 
-                                // Chamar a função de geocodificação para obter as coordenadas
                                 loginViewModel.viewModelScope.launch {
-                                    val coordinates = GeocodingHelper.getCoordinates(context, address) // Adicione o 'context'
+                                    val coordinates = GeocodingHelper.getCoordinates(context, address)
                                     if (coordinates != null) {
                                         latitude = coordinates.first
                                         longitude = coordinates.second

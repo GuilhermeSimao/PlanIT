@@ -54,16 +54,18 @@ fun Navigation() {
         }
 
         composable(
-            route = Screen.DetailScreen.route + "/{eventId}",
+            route = Screen.DetailScreen.route,
             arguments = listOf(
-                navArgument("eventId") { type = NavType.IntType }
+                navArgument("eventId") { type = NavType.IntType },
+                navArgument("currentUserId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val eventId = backStackEntry.arguments?.getInt("eventId") ?: 0
-            val eventDetailsViewModel: EventDetailsViewModel = viewModel()
+            val currentUserId = backStackEntry.arguments?.getInt("currentUserId") ?: 0
             DetailScreen(
                 eventId = eventId,
-                viewModel = eventDetailsViewModel,
+                currentUserId = currentUserId,
+                viewModel = viewModel(),
                 navController = navController
             )
         }
@@ -85,10 +87,10 @@ fun Navigation() {
             arguments = listOf(navArgument("userId") { type = NavType.IntType })
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getInt("userId") ?: 0
-            println("Opening PendingInvitesScreen for userId: $userId") // Debug
-            val participantViewModel: ParticipantViewModel = viewModel()
+            val currentUserId = backStackEntry.arguments?.getInt("userId") ?: 0
             PendingInvitesScreen(
                 userId = userId,
+                currentUserId = currentUserId,
                 viewModel = participantViewModel,
                 navController = navController
             )

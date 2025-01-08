@@ -5,7 +5,10 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object CreateEvent : Screen("create_event")
-    object DetailScreen : Screen("detail_screen")
+    object DetailScreen : Screen("detail_screen/{eventId}/{currentUserId}") {
+        fun withArgs(eventId: String, currentUserId: String): String =
+            "detail_screen/$eventId/$currentUserId"
+    }
     object ManageParticipants : Screen("manage_participants/{eventId}") {
         fun withArgs(eventId: String): String = "manage_participants/$eventId"
     }
@@ -16,7 +19,6 @@ sealed class Screen(val route: String) {
             return route
         }
     }
-
     fun withArgs(vararg args: String): String {
         return buildString {
             append(route)

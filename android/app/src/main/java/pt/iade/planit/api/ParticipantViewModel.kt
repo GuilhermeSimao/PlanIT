@@ -23,7 +23,6 @@ class ParticipantViewModel : ViewModel() {
                     onSuccess(response)
                 }
             } catch (e: retrofit2.HttpException) {
-                // Trata erros HTTP com mensagens específicas
                 val errorMessage = when (e.code()) {
                     400 -> "Convite inválido. Verifique os dados fornecidos."
                     404 -> "Usuário ou evento não encontrado."
@@ -35,7 +34,6 @@ class ParticipantViewModel : ViewModel() {
                     onError(errorMessage)
                 }
             } catch (e: Exception) {
-                // Trata outros erros genéricos
                 withContext(Dispatchers.Main) {
                     onError("Erro ao enviar o convite: ${e.message ?: "Erro desconhecido"}")
                 }
@@ -74,11 +72,11 @@ class ParticipantViewModel : ViewModel() {
     fun getPendingInvites(userId: Int, onSuccess: (List<ParticipantResponse>) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                println("Fetching pending invites for userId: $userId") // Debug
+                println("Fetching pending invites for userId: $userId")
                 val response = RetrofitInstance.api.getPendingInvites(userId)
                 withContext(Dispatchers.Main) { onSuccess(response) }
             } catch (e: Exception) {
-                println("Error fetching invites: ${e.message}") // Debug
+                println("Error fetching invites: ${e.message}")
                 withContext(Dispatchers.Main) { onError(e.message ?: "Erro desconhecido") }
             }
         }

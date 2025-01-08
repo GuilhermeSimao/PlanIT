@@ -1,6 +1,5 @@
 package pt.iade.planit
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavController) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
@@ -79,7 +77,7 @@ fun MainScreen(id: Int?, loginViewModel: LoginViewModel, navController: NavContr
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(events) { event ->
-                        EventCard(event, navController)
+                        EventCard(event, navController, id)
                     }
                 }
             }
@@ -169,7 +167,7 @@ fun ActionMenu(id: Int?, navController: NavController) {
 }
 
 @Composable
-fun EventCard(event: Event, navController: NavController) {
+fun EventCard(event: Event, navController: NavController, id: Int?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -233,7 +231,11 @@ fun EventCard(event: Event, navController: NavController) {
 
             Button(
                 onClick = {
-                    navController.navigate(Screen.DetailScreen.withArgs(event.id.toString()))
+                    id?.let { currentUserId ->
+                        navController.navigate(
+                            Screen.DetailScreen.withArgs(event.id.toString(), currentUserId.toString())
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

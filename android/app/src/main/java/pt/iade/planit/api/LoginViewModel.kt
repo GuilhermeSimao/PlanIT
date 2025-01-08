@@ -69,7 +69,6 @@ class LoginViewModel : ViewModel() {
                     onSuccess(response.id)
                 }
             } catch (e: retrofit2.HttpException) {
-                // Trata erros HTTP com mensagens específicas
                 val errorMessage = when (e.code()) {
                     400 -> "Requisição inválida. Verifique os dados fornecidos."
                     401 -> "E-mail ou senha incorretos."
@@ -82,7 +81,6 @@ class LoginViewModel : ViewModel() {
                     onError(errorMessage)
                 }
             } catch (e: Exception) {
-                // Trata outros erros genéricos
                 withContext(Dispatchers.Main) {
                     onError("Erro ao conectar ao servidor: ${e.message ?: "Erro desconhecido"}")
                 }
@@ -138,7 +136,6 @@ class LoginViewModel : ViewModel() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        // Criação do objeto de evento com localização
         val event = Event(
             userId = userId,
             title = title,
@@ -149,11 +146,10 @@ class LoginViewModel : ViewModel() {
             longitude = longitude
         )
 
-        // Fazer a requisição para criar o evento
         viewModelScope.launch {
             try {
                 RetrofitInstance.api.createEvent(event)
-                onSuccess() // Chama onSuccess caso o evento seja criado com sucesso
+                onSuccess()
             } catch (e: retrofit2.HttpException) {
                 val errorMessage = when (e.code()) {
                     400 -> "Dados inválidos. Verifique os campos."
@@ -169,8 +165,6 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
-
 
 }
 

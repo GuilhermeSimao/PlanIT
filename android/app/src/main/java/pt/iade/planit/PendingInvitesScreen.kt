@@ -14,9 +14,8 @@ import androidx.navigation.NavController
 import pt.iade.planit.api.ParticipantResponse
 import pt.iade.planit.viewmodel.ParticipantViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navController: NavController) {
+fun PendingInvitesScreen(userId: Int, currentUserId: Int, viewModel: ParticipantViewModel, navController: NavController) {
     var invites by remember { mutableStateOf<List<ParticipantResponse>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
 
@@ -63,7 +62,9 @@ fun PendingInvitesScreen(userId: Int, viewModel: ParticipantViewModel, navContro
                         InviteCard(
                             invite = invite,
                             onCardClick = { eventId ->
-                                navController.navigate(Screen.DetailScreen.withArgs(eventId.toString()))
+                                navController.navigate(
+                                    Screen.DetailScreen.withArgs(eventId.toString(), currentUserId.toString())
+                                )
                             },
                             onAccept = {
                                 viewModel.updateParticipantStatus(invite.id, "confirmed", {

@@ -20,7 +20,6 @@ fun ConfirmedEventsScreen(
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
-    // Carregar eventos confirmados
     LaunchedEffect(userId) {
         loginViewModel.getConfirmedEvents(userId) { result ->
             events = result
@@ -57,15 +56,13 @@ fun ConfirmedEventsScreen(
                     contentPadding = PaddingValues(8.dp)
                 ) {
                     items(events) { event ->
-                        EventCard(event, navController)
+                        EventCard(event, navController, userId)
                     }
                 }
             }
         }
     }
 }
-
-
 
 @Composable
 fun EmptyStateMessage() {

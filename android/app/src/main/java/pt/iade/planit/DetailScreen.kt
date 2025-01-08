@@ -32,19 +32,24 @@ fun formatDate(dateString: String): String {
         val date = inputFormat.parse(dateString)
         date?.let { outputFormat.format(it) } ?: dateString
     } catch (e: Exception) {
-        dateString // Retorna o original caso haja erro
+        dateString
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: NavController) {
+fun DetailScreen(
+    eventId: Int,
+    currentUserId: Int,
+    viewModel: EventDetailsViewModel,
+    navController: NavController
+) {
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchEventDetails(eventId, {
             isLoading = false
+            println("Criador do evento: ${viewModel.eventDetails?.userId}")
         }, { error ->
             isLoading = false
             errorMessage = error
@@ -71,6 +76,8 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
         } else {
             val eventDetails = viewModel.eventDetails!!
 
+            println("Criador do evento: ${eventDetails.userId}, Usuário atual: $currentUserId")
+
             LazyColumn(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -79,7 +86,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    // Event Image
                     Image(
                         painter = rememberAsyncImagePainter(eventDetails.photoUrl),
                         contentDescription = "Event Image",
@@ -89,7 +95,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         contentScale = ContentScale.Crop
                     )
 
-                    // Event Title
                     Text(
                         text = eventDetails.title,
                         style = MaterialTheme.typography.headlineMedium
@@ -97,7 +102,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Event Date and Time
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.CalendarToday,
@@ -106,12 +110,11 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = formatDate(eventDetails.date), // Formata a data
+                            text = formatDate(eventDetails.date),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
 
-                    // Event Location
                     eventDetails.location?.let {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -128,7 +131,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                         }
                     }
 
-                    // Event Description
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Descrição:",
@@ -141,7 +143,6 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     )
                 }
 
-                // Participants Section
                 item {
                     Text(
                         text = "Participantes:",
@@ -176,19 +177,19 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
                     }
                 }
 
-                // Manage Participants Button
-                item {
-                    Button(
-                        onClick = {
-                            navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Gerir Participantes")
+                if (eventDetails.userId == currentUserId.toDouble()) {
+                    item {
+                        Button(
+                            onClick = {
+                                navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Gerir Participantes")
+                        }
                     }
                 }
 
-                // Map Section with Event Latitude and Longitude
                 item {
                     eventDetails.latitude?.let { lat ->
                         eventDetails.longitude?.let { lng ->
@@ -207,6 +208,7 @@ fun DetailScreen(eventId: Int, viewModel: EventDetailsViewModel, navController: 
         }
     }
 }
+
 
 @Composable
 fun GoogleMapView(latitude: Double, longitude: Double) {

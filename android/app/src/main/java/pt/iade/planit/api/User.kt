@@ -1,4 +1,3 @@
-// User.kt
 package pt.iade.planit.api
 
 data class User(

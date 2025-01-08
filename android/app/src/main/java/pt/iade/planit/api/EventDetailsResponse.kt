@@ -10,7 +10,8 @@ data class EventDetailsResponse(
     val location: LocationResponse?,
     val participants: List<ParticipantResponse>,
     val latitude: Double?,
-    val longitude: Double?
+    val longitude: Double?,
+    val userId: Any
 )
 
 data class LocationResponse(

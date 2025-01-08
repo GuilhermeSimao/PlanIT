@@ -3,8 +3,6 @@ package pt.iade.planit
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,7 +12,6 @@ import androidx.navigation.NavController
 import pt.iade.planit.api.ParticipantResponse
 import pt.iade.planit.viewmodel.ParticipantViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageParticipantsScreen(
     eventId: Int,
@@ -106,7 +103,6 @@ fun ParticipantItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Coluna com Nome e Status
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -126,7 +122,6 @@ fun ParticipantItem(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Botão de ações com Dropdown
             Box {
                 Button(onClick = { expanded = true }) {
                     Text("Ações")
@@ -139,7 +134,7 @@ fun ParticipantItem(
                         text = { Text("Confirmar") },
                         onClick = {
                             viewModel.updateParticipantStatus(participant.id, "confirmed", {
-                                onUpdate() // Atualiza a lista de participantes
+                                onUpdate()
                             }, {})
                             expanded = false
                         }
@@ -148,7 +143,7 @@ fun ParticipantItem(
                         text = { Text("Recusar") },
                         onClick = {
                             viewModel.updateParticipantStatus(participant.id, "declined", {
-                                onUpdate() // Atualiza a lista de participantes
+                                onUpdate()
                             }, {})
                             expanded = false
                         }

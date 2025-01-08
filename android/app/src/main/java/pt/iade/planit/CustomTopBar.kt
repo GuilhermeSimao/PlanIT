@@ -21,9 +21,9 @@ fun CustomTopBar(
     TopAppBar(
         title = { Text(
             text = title,
-            color = MaterialTheme.colorScheme.onPrimary, // Contraste do texto
-            textAlign = TextAlign.Center, // Centraliza o texto
-            modifier = Modifier.fillMaxWidth() // Faz o texto ocupar toda a largura
+            color = MaterialTheme.colorScheme.onPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         ) },
         navigationIcon = {
             if (showBackButton) {
@@ -42,7 +42,7 @@ fun CustomTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary // Cor de fundo roxa
+            containerColor = MaterialTheme.colorScheme.primary
         )
     )
 }

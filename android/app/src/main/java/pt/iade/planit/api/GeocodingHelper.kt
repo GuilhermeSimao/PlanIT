@@ -14,7 +14,7 @@ object GeocodingHelper {
     private const val BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 
     suspend fun getCoordinates(context: Context, address: String): Pair<Double, Double>? {
-        val apiKey = context.getString(R.string.google_maps_key) // Certifique-se de que está no strings.xml
+        val apiKey = context.getString(R.string.google_maps_key)
         val url = "$BASE_URL?address=${address.replace(" ", "+")}&key=$apiKey"
 
         return withContext(Dispatchers.IO) {

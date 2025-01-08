@@ -1,4 +1,3 @@
-// RetrofitInstance.kt
 package pt.iade.planit.api
 
 import okhttp3.OkHttpClient
