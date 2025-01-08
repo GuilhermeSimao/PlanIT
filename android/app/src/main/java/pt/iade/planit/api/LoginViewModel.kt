@@ -15,20 +15,6 @@ import pt.iade.planit.api.UserCredentials
 
 class LoginViewModel : ViewModel() {
 
-    fun loginUser(email: String, password: String, onSuccess: (Int) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.api.login(UserCredentials(email, password))
-                Log.d("Login", "Usuário logado com sucesso: ${response}")
-                withContext(Dispatchers.Main) {
-                    onSuccess(response.id)
-                }
-            } catch (e: Exception) {
-                Log.e("Login", "Erro ao fazer login", e)
-            }
-        }
-    }
-
     fun registerUser(name: String, email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -103,27 +89,6 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
-
-    fun getEventDetails(
-        eventId: Int,
-        onSuccess: (EventDetailsResponse) -> Unit,
-        onError: (String) -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val eventDetails = RetrofitInstance.api.getEventDetails(eventId)
-                withContext(Dispatchers.Main) {
-                    onSuccess(eventDetails)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onError("Failed to load event details: ${e.message}")
-                }
-            }
-        }
-    }
-
 
     fun createEvent(
         userId: Int,

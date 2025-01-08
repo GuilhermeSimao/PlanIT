@@ -53,12 +53,3 @@ object GeocodingHelper {
         }
     }
 }
-
-    private fun getApiKey(context: Context): String? {
-        val metaData = context.packageManager.getApplicationInfo(
-            context.packageName,
-            android.content.pm.PackageManager.GET_META_DATA
-        ).metaData
-        return metaData?.getString("com.google.android.maps.v2.API_KEY")
-    }
-
