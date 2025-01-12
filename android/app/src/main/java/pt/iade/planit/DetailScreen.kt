@@ -45,11 +45,11 @@ fun DetailScreen(
 ) {
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchEventDetails(eventId, {
             isLoading = false
-            println("Criador do evento: ${viewModel.eventDetails?.userId}")
         }, { error ->
             isLoading = false
             errorMessage = error
@@ -75,8 +75,6 @@ fun DetailScreen(
             }
         } else {
             val eventDetails = viewModel.eventDetails!!
-
-            println("Criador do evento: ${eventDetails.userId}, Usuário atual: $currentUserId")
 
             LazyColumn(
                 modifier = Modifier
@@ -179,13 +177,32 @@ fun DetailScreen(
 
                 if (eventDetails.userId == currentUserId.toDouble()) {
                     item {
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
-                            },
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Gerir Participantes")
+                            Button(
+                                onClick = {
+                                    navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Gerir Participantes")
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Button(
+                                onClick = {
+                                    showDeleteDialog = true
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                ),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Eliminar Evento")
+                            }
                         }
                     }
                 }
@@ -205,6 +222,35 @@ fun DetailScreen(
                     }
                 }
             }
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Confirmar Exclusão") },
+                text = { Text("Tem certeza de que deseja eliminar este evento?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showDeleteDialog = false
+                            viewModel.deleteEvent(eventId, onSuccess = {
+                                navController.navigate("main_screen/$currentUserId") {
+                                    popUpTo(Screen.MainScreen.route + "/{id}") { inclusive = true }
+                                }
+                            }, onError = { error ->
+                                errorMessage = error
+                            })
+                        }
+                    ) {
+                        Text("Eliminar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 }

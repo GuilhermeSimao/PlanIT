@@ -23,4 +23,24 @@ class EventDetailsViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteEvent(eventId: Int, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Chamada para a API usando RetrofitInstance
+                RetrofitInstance.api.deleteEvent(eventId)
+                // Volta para a thread principal para executar a callback de sucesso
+                withContext(Dispatchers.Main) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                // Volta para a thread principal para executar a callback de erro
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: "Erro ao excluir o evento")
+                }
+            }
+        }
+    }
+
+
 }

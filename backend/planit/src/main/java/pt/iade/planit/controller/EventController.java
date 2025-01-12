@@ -20,11 +20,13 @@ public class EventController {
     // Add Event
     @PostMapping("/add")
     public ResponseEntity<Map<String, String>> addEvent(@RequestBody EventDTO event) {
+        System.out.println("Payload recebido: " + event);
         eventService.createEvent(event);
         Map<String, String> response = new HashMap<>();
         response.put("message", "Event created successfully");
         return ResponseEntity.ok(response);
     }
+
 
     // Get Events by User ID
     @GetMapping("/user/{userId}")

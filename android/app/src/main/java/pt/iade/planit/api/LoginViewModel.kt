@@ -98,6 +98,7 @@ class LoginViewModel : ViewModel() {
         photoUrl: String?,
         latitude: Double,
         longitude: Double,
+        address: String,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
@@ -108,7 +109,8 @@ class LoginViewModel : ViewModel() {
             date = date,
             photoUrl = photoUrl,
             latitude = latitude,
-            longitude = longitude
+            longitude = longitude,
+            address = address
         )
 
         viewModelScope.launch {

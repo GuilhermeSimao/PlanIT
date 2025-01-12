@@ -10,11 +10,15 @@ import androidx.navigation.NavController
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import pt.iade.planit.api.GeocodingHelper
 import java.util.*
@@ -48,7 +52,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
     var description by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
-    var photoUrl by remember { mutableStateOf("") }
+    var photoUri by remember { mutableStateOf<String?>(null) } // Agora para URI da imagem local
     var address by remember { mutableStateOf("") }
     var latitude by remember { mutableStateOf(0.0) }
     var longitude by remember { mutableStateOf(0.0) }
@@ -56,6 +60,13 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    // Lançador para selecionar imagens do armazenamento
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { photoUri = it.toString() }
+    }
 
     Scaffold(
         topBar = {
@@ -144,13 +155,24 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                TextField(
-                    value = photoUrl,
-                    onValueChange = { photoUrl = it },
-                    label = { Text("Photo URL") },
-                    placeholder = { Text("Optional image URL") },
+                // Botão para selecionar a imagem
+                Button(
+                    onClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier.fillMaxWidth()
-                )
+                ) {
+                    Text("Select Image")
+                }
+
+                // Pré-visualização da imagem selecionada
+                photoUri?.let {
+                    AsyncImage(
+                        model = it,
+                        contentDescription = "Selected Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -159,7 +181,7 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                 } else {
                     Button(
                         onClick = {
-                            if (title.isNotBlank() && description.isNotBlank() && date.isNotBlank() && time.isNotBlank() && address.isNotBlank()) {
+                            if (title.isNotBlank() && description.isNotBlank() && date.isNotBlank() && time.isNotBlank() && address.isNotBlank() && photoUri != null) {
                                 isLoading = true
                                 val dateTime = "${date}T$time"
 
@@ -168,31 +190,36 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
                                     if (coordinates != null) {
                                         latitude = coordinates.first
                                         longitude = coordinates.second
-
-                                        loginViewModel.createEvent(
-                                            userId = userId,
-                                            title = title,
-                                            description = description,
-                                            date = dateTime,
-                                            photoUrl = photoUrl,
-                                            latitude = latitude,
-                                            longitude = longitude,
-                                            onSuccess = {
-                                                isLoading = false
-                                                navController.popBackStack()
-                                            },
-                                            onError = { error ->
-                                                isLoading = false
-                                                errorMessage = error
-                                            }
-                                        )
+                                        Log.d("CreateEventScreen", "Coordinates: latitude=$latitude, longitude=$longitude")
                                     } else {
                                         isLoading = false
-                                        errorMessage = "Failed to retrieve location coordinates."
+                                        errorMessage = "Endereço inválido. Não foi possível obter as coordenadas."
+                                        return@launch
                                     }
+
+                                    Log.d("CreateEventScreen", "Address: $address")
+
+                                    loginViewModel.createEvent(
+                                        userId = userId,
+                                        title = title,
+                                        description = description,
+                                        date = dateTime,
+                                        photoUrl = photoUri,
+                                        latitude = latitude,
+                                        longitude = longitude,
+                                        address = address,
+                                        onSuccess = {
+                                            isLoading = false
+                                            navController.popBackStack()
+                                        },
+                                        onError = { error ->
+                                            isLoading = false
+                                            errorMessage = error
+                                        }
+                                    )
                                 }
                             } else {
-                                errorMessage = "Preencha todos os campos obrigatórios."
+                                errorMessage = "Preencha todos os campos obrigatórios e selecione uma imagem."
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -208,4 +235,5 @@ fun CreateEventScreen(navController: NavController, loginViewModel: LoginViewMod
         }
     }
 }
+
 

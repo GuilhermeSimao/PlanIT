@@ -28,40 +28,51 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void createEvent(EventDTO eventDto) {
-        // Valida o ID do usuário
         if (eventDto.getUserId() == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
 
-        // Busca o usuário
+        // Buscar o usuário associado ao evento
         User user = userRepository.findById(eventDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + eventDto.getUserId()));
 
-        // Cria o evento
+        // Criar o objeto do evento
         Event event = new Event();
         event.setTitle(eventDto.getTitle());
         event.setDescription(eventDto.getDescription());
         event.setDate(eventDto.getDate());
 
-        // Adiciona uma imagem padrão se o photoUrl for nulo ou vazio
-        String defaultImageUrl = "https://lh3.googleusercontent.com/proxy/yWa9el0QN4WLu-qDs1CGZQoCfyN15OalYcYKiVOcvR1084frMFWjIrF2O0SQ83Ft-yTNaIKqjDLZ8p389g6P290ukkn4jj4rKDmiRmeFeIsVZgbHKe2XchNwyHwK_i7YZzPbZZSjuMPIcohOywArQyspLiL-KNBS9ugpIiIk"; // Substitua pelo seu URL de imagem padrão
-        event.setPhotoUrl(eventDto.getPhotoUrl() != null && !eventDto.getPhotoUrl().isEmpty() ? eventDto.getPhotoUrl() : defaultImageUrl);
+        // Configurar a URL da foto (caso não seja fornecida, usar um padrão)
+        String defaultImageUrl = "https://example.com/images/default.jpg";
+        event.setPhotoUrl(eventDto.getPhotoUrl() != null && !eventDto.getPhotoUrl().isEmpty()
+                ? eventDto.getPhotoUrl()
+                : defaultImageUrl);
 
         event.setUser(user);
 
-        // Verifica e salva a localização
-        if (eventDto.getLatitude() != null && eventDto.getLongitude() != null) {
+        // Logs para verificar os dados recebidos
+        System.out.println("Latitude: " + eventDto.getLatitude());
+        System.out.println("Longitude: " + eventDto.getLongitude());
+        System.out.println("Address: " + eventDto.getAddress());
+
+        // Processar a localização
+        if (eventDto.getLatitude() != null && eventDto.getLongitude() != null && eventDto.getAddress() != null) {
             Location location = new Location();
             location.setLatitude(eventDto.getLatitude());
             location.setLongitude(eventDto.getLongitude());
             location.setAddress(eventDto.getAddress());
 
-            Location savedLocation = locationRepository.save(location);
-            event.setLocation(savedLocation); // Vincula a localização ao evento
+            // Salvar a localização e associá-la ao evento
+            location = locationRepository.save(location);
+            System.out.println("Saving Location: " + location);
+            event.setLocation(location);
+        } else {
+            System.out.println("Localização não fornecida para o evento.");
         }
 
-        // Salva o evento
+        // Salvar o evento no banco de dados
         eventRepository.save(event);
+        System.out.println("Event Saved: " + event);
     }
 
 
@@ -82,10 +93,11 @@ public class EventServiceImpl implements EventService {
             dto.setUserEmail(event.getUser().getEmail());
 
             if (event.getLocation() != null) {
-                dto.setLocationId(event.getLocation().getId());
+                dto.setAddress(event.getLocation().getAddress());
                 dto.setLatitude(event.getLocation().getLatitude());
                 dto.setLongitude(event.getLocation().getLongitude());
-                dto.setAddress(event.getLocation().getAddress());
+            } else {
+                dto.setAddress(null); // Explicitamente defina null se não houver localização
             }
 
             return dto;
@@ -132,13 +144,18 @@ public class EventServiceImpl implements EventService {
         dto.setUserId(event.getUser().getId());
         dto.setUserName(event.getUser().getName());
 
+        // Configurar localização se estiver presente
         if (event.getLocation() != null) {
-            dto.setLocationId(event.getLocation().getId());
-            dto.setAddress(event.getLocation().getAddress());
-            dto.setLatitude(event.getLocation().getLatitude());
-            dto.setLongitude(event.getLocation().getLongitude());
+            Location location = event.getLocation();
+            dto.setAddress(location.getAddress());
+            dto.setLatitude(location.getLatitude());
+            dto.setLongitude(location.getLongitude());
+            System.out.println("Localização encontrada: " + location.getAddress());
+        } else {
+            System.out.println("Evento sem localização associada.");
         }
 
+        // Mapear participantes
         dto.setParticipants(event.getParticipants().stream().map(participant -> {
             ParticipantDTO participantDTO = new ParticipantDTO();
             participantDTO.setUserId(participant.getUser().getId());
@@ -147,8 +164,10 @@ public class EventServiceImpl implements EventService {
             return participantDTO;
         }).toList());
 
+        System.out.println("Evento processado: " + dto);
         return dto;
     }
+
 
 
     @Override
@@ -204,6 +223,8 @@ public class EventServiceImpl implements EventService {
                 dto.setAddress(event.getLocation().getAddress());
                 dto.setLatitude(event.getLocation().getLatitude());
                 dto.setLongitude(event.getLocation().getLongitude());
+            } else {
+                dto.setAddress(null); // Explicitamente defina null se não houver localização
             }
 
             return dto;
@@ -226,9 +247,11 @@ public class EventServiceImpl implements EventService {
             dto.setUserEmail(event.getUser().getEmail());
 
             if (event.getLocation() != null) {
+                dto.setAddress(event.getLocation().getAddress());
                 dto.setLatitude(event.getLocation().getLatitude());
                 dto.setLongitude(event.getLocation().getLongitude());
-                dto.setAddress(event.getLocation().getAddress());
+            } else {
+                dto.setAddress(null); // Explicitamente defina null se não houver localização
             }
 
             return dto;

@@ -6,7 +6,8 @@ data class Event(
     val title: String,
     val description: String,
     val date: String,
-    val photoUrl: String?,
+    val photoUrl: String? = null,
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
+    val address: String
 )
