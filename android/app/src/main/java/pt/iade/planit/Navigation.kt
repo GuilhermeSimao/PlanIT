@@ -108,5 +108,14 @@ fun Navigation() {
             )
         }
 
+        composable(
+            route = "edit_event/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getInt("eventId") ?: 0
+            EditEventScreen(eventId = eventId, viewModel = viewModel(), navController = navController)
+        }
+
+
     }
 }

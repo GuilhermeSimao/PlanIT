@@ -175,33 +175,46 @@ fun DetailScreen(
                     }
                 }
 
-                if (eventDetails.userId == currentUserId.toDouble()) {
+                if (eventDetails.userId.toDouble() == currentUserId.toDouble()) {
                     item {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = {
-                                    navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
-                                },
-                                modifier = Modifier.weight(1f)
+                        Column {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Gerir Participantes")
+                                Button(
+                                    onClick = {
+                                        navController.navigate(Screen.ManageParticipants.withArgs(eventId.toString()))
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Gerir Participantes")
+                                }
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Button(
+                                    onClick = {
+                                        showDeleteDialog = true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.error
+                                    ),
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("Eliminar Evento")
+                                }
                             }
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             Button(
                                 onClick = {
-                                    showDeleteDialog = true
+                                    navController.navigate("edit_event/$eventId")
                                 },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.error
-                                ),
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text("Eliminar Evento")
+                                Text("Editar Evento")
                             }
                         }
                     }
@@ -255,10 +268,11 @@ fun DetailScreen(
     }
 }
 
-
 @Composable
 fun GoogleMapView(latitude: Double, longitude: Double) {
-    val location = LatLng(latitude, longitude)
+    val location = remember(latitude, longitude) {
+        LatLng(latitude, longitude)
+    }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(location, 15f)
     }
@@ -280,4 +294,3 @@ fun GoogleMapView(latitude: Double, longitude: Double) {
         }
     }
 }
-

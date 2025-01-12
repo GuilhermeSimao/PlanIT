@@ -6,6 +6,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -51,5 +52,12 @@ interface ApiService {
 
     @DELETE("/event/delete/{eventId}")
     suspend fun deleteEvent(@Path("eventId") eventId: Int)
+
+    @PUT("/event/update/{eventId}")
+    suspend fun updateEvent(
+        @Path("eventId") eventId: Int,
+        @Body event: Event
+    ): Response<Unit>
+
 
 }

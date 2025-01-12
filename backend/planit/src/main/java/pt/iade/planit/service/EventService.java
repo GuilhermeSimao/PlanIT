@@ -12,6 +12,6 @@ public interface EventService {
     EventDTO getEventDetails(Integer eventId);
     List<EventDTO> searchEvents(String title, String description, String date, String address);
     List<EventDTO> findConfirmedParticipatingEvents(Integer userId);
-
+    void updateEvent(Integer eventId, EventDTO eventDTO);
 
 }

@@ -258,5 +258,32 @@ public class EventServiceImpl implements EventService {
         }).toList();
     }
 
+    @Override
+    public void updateEvent(Integer eventId, EventDTO eventDTO) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+
+        event.setTitle(eventDTO.getTitle());
+        event.setDescription(eventDTO.getDescription());
+        event.setDate(eventDTO.getDate());
+        event.setPhotoUrl(eventDTO.getPhotoUrl());
+
+        // Atualizar localização
+        if (eventDTO.getLatitude() != null && eventDTO.getLongitude() != null && eventDTO.getAddress() != null) {
+            Location location = event.getLocation();
+            if (location == null) {
+                location = new Location();
+            }
+            location.setLatitude(eventDTO.getLatitude());
+            location.setLongitude(eventDTO.getLongitude());
+            location.setAddress(eventDTO.getAddress());
+            location = locationRepository.save(location);
+            event.setLocation(location);
+        }
+
+        eventRepository.save(event);
+    }
+
+
 
 }
