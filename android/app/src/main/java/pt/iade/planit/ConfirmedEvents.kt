@@ -30,7 +30,7 @@ fun ConfirmedEventsScreen(
     Scaffold(
         topBar = {
             CustomTopBar(
-                title = "Create Event",
+                title = "Eventos Confirmados",
                 showBackButton = true,
                 onBackClick = { navController.popBackStack() }
             )
